@@ -12,10 +12,10 @@ namespace RBNF.Preprocessing
         private string TestingDataUpPath, TestingDataDownPath, TestingDataLeftPath, TestingDataRightPath;
 
         private int ClassNo = 4;
-        private int TrainingNoInClass = 50;
-        private int TestingNoInClass = 30;
-        private int SamplesWidth = 50;
-        private int SamplesHeight = 50;
+        private int TrainingNoInClass = 10;
+        private int TestingNoInClass = 5;
+        private int SamplesWidth = 30;
+        private int SamplesHeight = 30;
 
         private byte[,,] TrainingInput;
         private byte[,,] TestingInput;

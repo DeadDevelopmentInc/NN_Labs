@@ -8,7 +8,7 @@ namespace RBNF
 {
     class RBFN
     {
-        private int TestingNoInClass = 30;
+        private int TestingNoInClass = 5;
         private int numOfEpocks;
         private double maxError, learningRate;
         private List<List<double>> Centroids; // means of all features 
