@@ -53,21 +53,25 @@ namespace RadialNetwork
             int numInput = 25;
             int numHidden = 5;
             int numOutput = 4;
-            RadialNetwork rn = new RadialNetwork(numInput, numHidden, numOutput);
+            RadialNetwork RBFN = new RadialNetwork(numInput, numHidden, numOutput);
 
             Console.WriteLine("\nBeginning RBF training\n");
             int maxIterations = 100;
-            double[] bestWeights = rn.Train(trainData, maxIterations);
+            double[] bestWeights = RBFN.Train(trainData, maxIterations);
 
             Console.WriteLine("\nEvaluating result RBF classification accuracy on the test data");
-            rn.SetWeights(bestWeights);
+            RBFN.SetWeights(bestWeights);
 
-            double acc = rn.Accuracy(testData);
+            double acc = RBFN.Accuracy(testData);
             Console.WriteLine("Classification accuracy = " + acc.ToString("F4"));
 
             while (fl)
             {
-                Console.WriteLine("Test");
+                Console.WriteLine("Test your image:\n");
+                string data = Console.ReadLine();
+                var bufer = data.Split(' ');
+                var items = bufer.Select(x => double.Parse(x)).ToList();
+                Console.WriteLine(RBFN.Predict(items.ToArray()).ToString());
             }
         }
 

@@ -103,15 +103,12 @@ namespace RadialNetwork
             int numWrong = 0;
             double[] xValues = new double[numInput]; // inputs
             double[] tValues = new double[numOutput]; // targets
-            double[] yValues; // computed Y
 
             for (int i = 0; i < testData.Length; ++i)
             {
                 Array.Copy(testData[i], xValues, numInput); // parse test data into x-values and t-values
                 Array.Copy(testData[i], numInput, tValues, 0, numOutput);
-                yValues = this.ComputeOutputs(xValues);
-                int maxIndex = MaxIndex(yValues); // which cell in yValues has largest value?
-                if (tValues[maxIndex] == 1.0) // ugly. consider AreEqual(double x, double y)
+                if (tValues[Predict(xValues)] == 1.0) // ugly. consider AreEqual(double x, double y)
                     ++numCorrect;
                 else
                     ++numWrong;
@@ -123,7 +120,7 @@ namespace RadialNetwork
         {
             double[] yValues; // computed Y
             yValues = this.ComputeOutputs(xValues);
-            return MaxIndex(yValues) - 1;
+            return MaxIndex(yValues);
         }
 
         private static int MaxIndex(double[] vector) // helper for Accuracy()
