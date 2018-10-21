@@ -46,13 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backpropagation.cs" />
-    <Compile Include="EM.cs" />
-    <Compile Include="FeedforwardNeuralNetwrok.cs" />
-    <Compile Include="IdentityFunction.cs" />
-    <Compile Include="Neuron.cs" />
-    <Compile Include="Preprocessing\Dataset.cs" />
-    <Compile Include="Preprocessing\Image.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Particle.cs" />
     <Compile Include="RBFN.cs" />
     <Compile Include="SingleForm.cs">
       <SubType>Form</SubType>
