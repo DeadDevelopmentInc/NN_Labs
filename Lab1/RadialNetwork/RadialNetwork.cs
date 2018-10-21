@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RBNF
+namespace RadialNetwork
 {
     public class RadialNetwork
     {
@@ -117,6 +117,13 @@ namespace RBNF
                     ++numWrong;
             }
             return (numCorrect * 1.0) / (numCorrect + numWrong); // ugly 2 - check for divide by zero
+        }
+
+        public int Predict(double[] xValues)
+        {
+            double[] yValues; // computed Y
+            yValues = this.ComputeOutputs(xValues);
+            return MaxIndex(yValues) - 1;
         }
 
         private static int MaxIndex(double[] vector) // helper for Accuracy()

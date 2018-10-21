@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("RBNF")]
+[assembly: AssemblyTitle("RadialNetwork")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RBNF")]
+[assembly: AssemblyProduct("RadialNetwork")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("6775b7bf-9b4e-4495-b6ac-2f288bb9d790")]
+[assembly: Guid("8a40597c-0cd4-4ce0-9134-a806753244b2")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
