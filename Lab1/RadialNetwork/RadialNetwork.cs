@@ -12,12 +12,7 @@ namespace RadialNetwork
         private int numInput;
         private int numHidden;
         private int numOutput;
-        private double[] inputs;
-        private double[][] centroids;
-        private double[] widths;
-        private double[][] hoWeights;
-        private double[] oBiases;
-        private double[] outputs;
+        public List<Layer> Layers = new List<Layer>();
 
         public RadialNetwork(int numInput, int numHidden, int numOutput)
         {
@@ -25,20 +20,9 @@ namespace RadialNetwork
             this.numInput = numInput;
             this.numHidden = numHidden;
             this.numOutput = numOutput;
-            this.inputs = new double[numInput];
-            this.centroids = MakeMatrix(numHidden, numInput);
-            this.widths = new double[numHidden];
-            this.hoWeights = MakeMatrix(numHidden, numOutput);
-            this.oBiases = new double[numOutput];
-            this.outputs = new double[numOutput];
-        } // ctor
-
-        private static double[][] MakeMatrix(int rows, int cols) // helper for ctor
-        {
-            double[][] result = new double[rows][];
-            for (int r = 0; r < rows; ++r)
-                result[r] = new double[cols];
-            return result;
+            Layers.Add(new Layer(numInput));
+            Layers.Add(new Layer(numInput, numHidden, numOutput));
+            Layers.Add(new Layer(numOutput));
         }
 
         // -- methods related to getting and setting centroids, widths, weights, bias values ----------
@@ -52,9 +36,9 @@ namespace RadialNetwork
             int k = 0; // ptr into weights
             for (int i = 0; i < numHidden; ++i)
                 for (int j = 0; j < numOutput; ++j)
-                    this.hoWeights[i][j] = weights[k++];
+                    this.Layers[1].Neurons[i].HoWeights[j] = weights[k++];
             for (int i = 0; i < numOutput; ++i)
-                this.oBiases[i] = weights[k++];
+                this.Layers[1].Neurons[i].OBias = weights[k++];
         }
 
         public double[] GetWeights()
@@ -63,9 +47,9 @@ namespace RadialNetwork
             int k = 0;
             for (int i = 0; i < numHidden; ++i)
                 for (int j = 0; j < numOutput; ++j)
-                    result[k++] = this.hoWeights[i][j];
+                    result[k++] = this.Layers[1].Neurons[i].HoWeights[j];
             for (int i = 0; i < numOutput; ++i)
-                result[k++] = this.oBiases[i];
+                result[k++] = this.Layers[2].Neurons[i].OBias;
             return result;
         }
 
@@ -143,14 +127,16 @@ namespace RadialNetwork
         public double[] ComputeOutputs(double[] xValues)
         {
             // use centroids, widths, weights and input xValues to compute, store, and return numOutputs output values
-            Array.Copy(xValues, this.inputs, xValues.Length); // place data inputs into RBF net inputs
+            var inputs = new double[numInput];
+            var outputs = new double[numOutput];
+            Array.Copy(xValues, inputs, xValues.Length); // place data inputs into RBF net inputs
 
             double[] hOutputs = new double[numHidden]; // hidden node outputs
             for (int j = 0; j < numHidden; ++j) // each hidden node
             {
-                double d = EuclideanDist(inputs, centroids[j], inputs.Length); // could use a 'distSquared' approach
-                                                                               //Console.WriteLine("\nHidden[" + j + "] distance = " + d.ToString("F4"));
-                double r = -1.0 * (d * d) / (2 * widths[j] * widths[j]);
+                double d = EuclideanDist(inputs, Layers[1].Neurons[j].Centroids, inputs.Length); // could use a 'distSquared' approach
+                var width= Layers[1].Neurons[j].Width;
+                double r = -1.0 * (d * d) / (2 * width * width);
                 double g = Math.Exp(r);
                 //Console.WriteLine("Hidden[" + j + "] output = " + g.ToString("F4"));
                 hOutputs[j] = g;
@@ -160,10 +146,10 @@ namespace RadialNetwork
 
             for (int k = 0; k < numOutput; ++k)
                 for (int j = 0; j < numHidden; ++j)
-                    tempResults[k] += (hOutputs[j] * hoWeights[j][k]); // accumulate
+                    tempResults[k] += (hOutputs[j] * Layers[1].Neurons[j].HoWeights[k]); // accumulate
 
             for (int k = 0; k < numOutput; ++k)
-                tempResults[k] += oBiases[k]; // add biases
+                tempResults[k] += Layers[1].Neurons[k].OBias; // add biases
 
             double[] finalOutputs = Softmax(tempResults); // scale the raw output so values sum to 1.0
 
@@ -171,7 +157,7 @@ namespace RadialNetwork
             //Helpers.ShowVector(finalOutputs, 3, finalOutputs.Length, true);
             //Console.ReadLine();
 
-            Array.Copy(finalOutputs, this.outputs, finalOutputs.Length); // transfer computed outputs to RBF net outputs
+            Array.Copy(finalOutputs, outputs, finalOutputs.Length); // transfer computed outputs to RBF net outputs
 
             double[] returnResult = new double[numOutput]; // also return computed outputs for convenience
             Array.Copy(finalOutputs, returnResult, outputs.Length);
@@ -240,7 +226,7 @@ namespace RadialNetwork
                 int idx = goodIndices[i]; // idx points to trainData
                 for (int j = 0; j < numInput; ++j)
                 {
-                    this.centroids[i][j] = trainData[idx][j]; // make a copy of values
+                    this.Layers[1].Neurons[i].Centroids[j] = trainData[idx][j]; // make a copy of values
                 }
             }
         } // DoCentroids
@@ -298,8 +284,8 @@ namespace RadialNetwork
 
             Console.WriteLine("The common width is: " + width.ToString("F4"));
 
-            for (int i = 0; i < this.widths.Length; ++i) // all widths the same
-                this.widths[i] = width;
+            for (int i = 0; i < this.Layers[1].Neurons.Count; ++i) // all widths the same
+                this.Layers[1].Neurons[i].Width = width;
         }
 
         //private void DoWidths(double[][] centroids)
@@ -482,7 +468,7 @@ namespace RadialNetwork
             DoCentroids(trainData); // find representative data, store their x-values into this.centroids
 
             Console.WriteLine("\n2. Computing a common width for each hidden node");
-            DoWidths(this.centroids); // measure of how far apart centroids are
+            DoWidths(this.Layers[1].GetCentroids()); // measure of how far apart centroids are
 
             int numWts = (numHidden * numOutput) + numOutput;
             Console.WriteLine("\n3. Determining " + numWts + " weights and bias values using PSO algorithm");
