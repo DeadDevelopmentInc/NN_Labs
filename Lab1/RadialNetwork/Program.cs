@@ -69,9 +69,21 @@ namespace RadialNetwork
             {
                 Console.WriteLine("Write path to your image:\n");
                 string data = Console.ReadLine();
-                var bufer = data.Split(' ');
-                var items = bufer.Select(x => double.Parse(x)).ToList();
-                Console.WriteLine(RBFN.Predict(items.ToArray()).ToString());
+                var items = Helpers.GetBitmap(data);
+                //var bufer = data.Split(' ');
+                //var items = bufer.Select(x => double.Parse(x)).ToList();
+                var res = RBFN.Predict(items.ToArray());
+                switch (res)
+                {
+                    case 0:  Console.WriteLine("Top Arrow");
+                        break;
+                    case 1:Console.WriteLine("Left Arrow");
+                        break;
+                    case 2:Console.WriteLine("Rigth Arrow");
+                        break;
+                    case 3:Console.WriteLine("Bot Arrow");
+                        break;
+                }
             }
         }
 

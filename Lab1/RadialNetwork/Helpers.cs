@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace RadialNetwork
 {
@@ -70,5 +71,25 @@ namespace RadialNetwork
             Console.WriteLine("");
         }
 
+
+        public static double[] GetBitmap(string pathToBitmap)
+        {
+            double[] test = null;
+            Bitmap bitmap = (Bitmap)Image.FromFile(pathToBitmap);
+            if (bitmap.Height == 5 && bitmap.Width == 5)
+            {
+                int k = 0;
+                test = new double[25];
+                for (int i = 0; i < 5; i++)
+                    for (int j = 0; j < 5; j++)
+                    {
+                        if (bitmap.GetPixel(i, j).B > 0 && bitmap.GetPixel(i, j).R > 0 && bitmap.GetPixel(i, j).G > 0)
+                            test[k++] = 0;
+                        else
+                            test[k++] = 1;
+                    }
+            }
+            return test;
+        }
     } // class Helpers
 }
