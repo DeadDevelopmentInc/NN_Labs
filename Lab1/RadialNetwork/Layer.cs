@@ -17,7 +17,7 @@ namespace RadialNetwork
 
         public Layer(int numOfNeurons)
         {
-            Neurons.AddRange(new Neuron[numOfNeurons]);
+            for (int i = 0; i < numOfNeurons; i++) { Neurons.Add(new Neuron()); }
         }
 
         public Layer(int numInput, int numHidden, int numOutput)

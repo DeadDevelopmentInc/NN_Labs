@@ -49,7 +49,7 @@ namespace RadialNetwork
             Console.WriteLine("\nTest data:\n");
             Helpers.ShowMatrix(testData, testData.Length, 3, true, false);
 
-            Console.WriteLine("\nCreating a 25-5-3 radial basis function network");
+            Console.WriteLine("\nCreating a 25-5-4 radial basis function network");
             int numInput = 25;
             int numHidden = 5;
             int numOutput = 4;
@@ -67,7 +67,7 @@ namespace RadialNetwork
 
             while (fl)
             {
-                Console.WriteLine("Test your image:\n");
+                Console.WriteLine("Write path to your image:\n");
                 string data = Console.ReadLine();
                 var bufer = data.Split(' ');
                 var items = bufer.Select(x => double.Parse(x)).ToList();

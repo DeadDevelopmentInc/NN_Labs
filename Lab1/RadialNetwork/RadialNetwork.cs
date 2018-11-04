@@ -38,7 +38,7 @@ namespace RadialNetwork
                 for (int j = 0; j < numOutput; ++j)
                     this.Layers[1].Neurons[i].HoWeights[j] = weights[k++];
             for (int i = 0; i < numOutput; ++i)
-                this.Layers[1].Neurons[i].OBias = weights[k++];
+                this.Layers[2].Neurons[i].OBias = weights[k++];
         }
 
         public double[] GetWeights()
@@ -149,7 +149,7 @@ namespace RadialNetwork
                     tempResults[k] += (hOutputs[j] * Layers[1].Neurons[j].HoWeights[k]); // accumulate
 
             for (int k = 0; k < numOutput; ++k)
-                tempResults[k] += Layers[1].Neurons[k].OBias; // add biases
+                tempResults[k] += Layers[2].Neurons[k].OBias; // add biases
 
             double[] finalOutputs = Softmax(tempResults); // scale the raw output so values sum to 1.0
 
