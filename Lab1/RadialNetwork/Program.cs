@@ -11,7 +11,6 @@ namespace RadialNetwork
         static void Main(string[] args)
         {
             double[][] allData = new double[20][];
-
             allData[0] = new double[] { 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 };
             allData[1] = new double[] { 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 };
             allData[2] = new double[] { 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 };
@@ -76,13 +75,13 @@ namespace RadialNetwork
                 var res = RBFN.Predict(items.ToArray());
                 switch (res)
                 {
-                    case 0:  Console.WriteLine("Left Arrow");
+                    case 0:  Console.WriteLine("Top Arrow");
                         break;
-                    case 1:Console.WriteLine("Up Arrow");
+                    case 1:Console.WriteLine("Left Arrow");
                         break;
                     case 2:Console.WriteLine("Rigth Arrow");
                         break;
-                    case 3:Console.WriteLine("Down Arrow");
+                    case 3:Console.WriteLine("Bot Arrow");
                         break;
                 }
             }

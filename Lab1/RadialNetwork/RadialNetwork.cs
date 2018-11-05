@@ -310,6 +310,8 @@ namespace RadialNetwork
 
         private double[] DoWeights(double[][] trainData, int maxIterations)
         {
+            // use PSO to find weights and bias values that produce a RBF network
+            // that best matches training data
             int numberParticles = trainData.Length / 3;
 
             int Dim = (numHidden * numOutput) + numOutput; // dimensions is num weights + num biases
@@ -350,7 +352,8 @@ namespace RadialNetwork
                     swarm[i].position.CopyTo(bestGlobalPosition, 0);
                 }
             } // initialization
-            
+
+            // main PSO algorithm
             // compute new velocity -> compute new position -> check if new best
 
             double w = 0.729; // inertia weight
@@ -433,7 +436,7 @@ namespace RadialNetwork
 
                 ++iteration;
 
-            } // while 
+            } // while (main PSO processing loop)
 
             //Console.WriteLine("\n\nFinal training MSE = " + smallesttGlobalError.ToString("F4") + "\n\n");
 
@@ -468,8 +471,9 @@ namespace RadialNetwork
             DoWidths(this.Layers[1].GetCentroids()); // measure of how far apart centroids are
 
             int numWts = (numHidden * numOutput) + numOutput;
-            Console.WriteLine("\n3. Determining " + numWts + " weights and bias values");
-            double[] bestWeights = DoWeights(trainData, maxIterations); 
+            Console.WriteLine("\n3. Determining " + numWts + " weights and bias values using PSO algorithm");
+            double[] bestWeights =
+              DoWeights(trainData, maxIterations); // use PSO to find weights that best (lowest MSE) weights and biases
 
             return bestWeights;
         } // Train
