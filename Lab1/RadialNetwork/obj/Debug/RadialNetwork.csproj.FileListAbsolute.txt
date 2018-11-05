@@ -1,0 +1,7 @@
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\bin\Debug\RadialNetwork.exe.config
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\bin\Debug\RadialNetwork.exe
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\bin\Debug\RadialNetwork.pdb
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\obj\Debug\RadialNetwork.csprojAssemblyReference.cache
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\obj\Debug\RadialNetwork.csproj.CoreCompileInputs.cache
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\obj\Debug\RadialNetwork.exe
+D:\GitHub\RBFN\RBFN\Lab1\RadialNetwork\obj\Debug\RadialNetwork.pdb
