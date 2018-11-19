@@ -89,6 +89,7 @@ namespace RadialNetwork
                             test[k++] = 1;
                     }
             }
+            else return null;
             return test;
         }
     } // class Helpers
