@@ -473,7 +473,7 @@ namespace RadialNetwork
             int numWts = (numHidden * numOutput) + numOutput;
             Console.WriteLine("\n3. Determining " + numWts + " weights and bias values using EM algorithm");
             double[] bestWeights =
-              DoWeights(trainData, maxIterations); // use EM to find weights that best (lowest MSE) weights and biases
+              DoWeights(trainData, maxIterations); // use EM to find weights that best weights and biases
 
             return bestWeights;
         } // Train
