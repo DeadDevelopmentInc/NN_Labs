@@ -18,10 +18,51 @@ def train_network(model, X, Y, b_s):
     model.fit(X, Y,epoch=20, batch_size = b_s)
     return model
 
+def train_svm(model, X, Y):
+    return model
+
 def predict(model, X):
     return model.predict(X)
 
 def main():
+    
+
+
+def main_SVM():
+    try:
+        if len(sys.argv[1:]) != 1:
+            raise Exception("Invalid command arguments")
+        tree = ET.parse(sys.argv[1:][0])
+        root = tree.getroot()
+        if len(root) != 2:
+            raise Exception("Invalid file, check file")
+        trainpath = root[0].attrib['name']
+        input_shape = int(root[1].attrib["size"])
+        batch_size = int(root[2].attrib["size"])
+        print("Start reading datasets")
+        X, Y = read_datasets(trainpath, 3)
+        print("Finish reading datasets\nStart creating and training SVM")
+        model = train_svm(model ,X, Y)
+        #training
+        flag_out = False
+        while !flag-out:
+            print("Choose option from list (write number of option)\n1.Recognize image\n2.Re-train SVM\n3.Exit ")
+            choose = read()
+            if choose == "1":
+                print("Write path to image: ")
+                pred = read_one_file(read())
+                print(predict(model, pred))
+            elif choose == "2":
+                X, Y = read_datasets(trainpath, 3)
+                model = train_svm(model ,X, Y)
+            else:
+                flag_out = True
+        
+    except Exception as ex:
+        print(ex)
+
+
+def main_NN():
     try:
         if len(sys.argv[1:]) != 1:
             raise Exception("Invalid command arguments")
@@ -43,7 +84,7 @@ def main():
         model.add(Dense(33,  activation='tanh'))
         model.add(Dense(3, activation='sigmoid'))
         model.compile(optimizer='adadelta', loss='binary_crossentropy', metrics=['accuracy'])
-        model = train(model ,X, Y, bacth_size)
+        model = train_network(model ,X, Y, bacth_size)
         #training
         flag_out = False
         while !flag-out:
@@ -55,10 +96,9 @@ def main():
                 print(predict(model, pred))
             elif choose == "2":
                 X, Y = read_datasets(trainpath, 3)
-                model = train(model ,X, Y, bacth_size)
+                model = train_network(model ,X, Y, bacth_size)
             else:
                 flag_out = True
-
         
     except Exception as ex:
         print(ex)
