@@ -1,6 +1,7 @@
 import sys
 import os
 import xml.etree.ElementTree as ET
+from .network import Network
 
 def reading_datasets(path, num_class):
     folders = os.listdir(path)
@@ -9,6 +10,16 @@ def reading_datasets(path, num_class):
     for folder in folders:
     
     return X, Y
+
+def reading_one_file(path)
+    return X
+
+def train(network, X, Y):
+    return network
+
+def predict(network, X):
+    return predict
+
 
 def main():
     try:

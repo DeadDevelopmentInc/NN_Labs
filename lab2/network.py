@@ -5,6 +5,7 @@ class Network():
     
 
     def train(self, X, Y):
+        
     
     def predict(self, X):
         return predict
