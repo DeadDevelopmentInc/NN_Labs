@@ -1,115 +1,130 @@
 import numpy as np
-import cvxopt.solvers
-import logging
+import scipy as scp
+
+from scipy import sparse as sp
+from scipy.sparse import linalg
 
 
-MIN_SUPPORT_VECTOR_MULTIPLIER = 1e-5
+class PrimalSVM():
 
+    def __init__(self, l2reg=1.0,):
+        self.l2reg = l2reg
+        self.newton_iter = 20
+        self._prec = 1e-6
 
-class SVMTrainer(object):
-    def __init__(self, kernel, c):
-        self._kernel = kernel
-        self._c = c
+        self.coef_ = None
+        self.support_vectors = None
 
-    def train(self, X, y):
-        """Given the training features X with labels y, returns a SVM
-        predictor representing the trained SVM.
-        """
-        lagrange_multipliers = self._compute_multipliers(X, y)
-        return self._construct_predictor(X, y, lagrange_multipliers)
+    def fit(self, X, Y):
 
-    def _gram_matrix(self, X):
-        n_samples, n_features = X.shape
-        K = np.zeros((n_samples, n_samples))
-        # TODO(tulloch) - vectorize
-        for i, x_i in enumerate(X):
-            for j, x_j in enumerate(X):
-                K[i, j] = self._kernel(x_i, x_j)
-        return K
+        self._X = X
+        self._Y = Y
 
-    def _construct_predictor(self, X, y, lagrange_multipliers):
-        support_vector_indices = \
-            lagrange_multipliers > MIN_SUPPORT_VECTOR_MULTIPLIER
+        self._solve_CG(X, Y)
 
-        support_multipliers = lagrange_multipliers[support_vector_indices]
-        support_vectors = X[support_vector_indices]
-        support_vector_labels = y[support_vector_indices]
+        return self
+        
 
-        # http://www.cs.cmu.edu/~guestrin/Class/10701-S07/Slides/kernels.pdf
-        # bias = y_k - \sum z_i y_i  K(x_k, x_i)
-        # Thus we can just predict an example with bias of zero, and
-        # compute error.
-        bias = np.mean(
-            [y_k - SVMPredictor(
-                kernel=self._kernel,
-                bias=0.0,
-                weights=support_multipliers,
-                support_vectors=support_vectors,
-                support_vector_labels=support_vector_labels).predict(x_k)
-             for (y_k, x_k) in zip(support_vector_labels, support_vectors)])
+    def _solve_CG(self, X, Y):
+        
+        [n, d] = X.shape
 
-        return SVMPredictor(
-            kernel=self._kernel,
-            bias=bias,
-            weights=support_multipliers,
-            support_vectors=support_vectors,
-            support_vector_labels=support_vector_labels)
+        self.w = np.zeros(d + 1)
 
-    def _compute_multipliers(self, X, y):
-        n_samples, n_features = X.shape
+        self.out = np.ones(n)
 
-        K = self._gram_matrix(X)
-        # Solves
-        # min 1/2 x^T P x + q^T x
-        # s.t.
-        #  Gx \coneleq h
-        #  Ax = b
+        l = self.l2reg
+        iter = 0
 
-        P = cvxopt.matrix(np.outer(y, y) * K)
-        q = cvxopt.matrix(-1 * np.ones(n_samples))
+        sv = np.where(self.out > 0)[0]
 
-        # -a_i \leq 0
-        # TODO(tulloch) - modify G, h so that we have a soft-margin classifier
-        G_std = cvxopt.matrix(np.diag(np.ones(n_samples) * -1))
-        h_std = cvxopt.matrix(np.zeros(n_samples))
+        mv2 = lambda v: self._matvec_mull(v, sv)
+        hess_vec = linalg.LinearOperator((d + 1, d + 1), matvec=mv2)
 
-        # a_i \leq c
-        G_slack = cvxopt.matrix(np.diag(np.ones(n_samples)))
-        h_slack = cvxopt.matrix(np.ones(n_samples) * self._c)
+        while True:
+            iter = iter + 1
+            if iter > self.newton_iter:
+                print("Maximum {0} of Newton steps reached, change newton_iter parameter or try larger lambda".format(
+                    iter))
+                break
 
-        G = cvxopt.matrix(np.vstack((G_std, G_slack)))
-        h = cvxopt.matrix(np.vstack((h_std, h_slack)))
+            obj, grad = self._obj_func(self.w, X, Y, self.out)
 
-        A = cvxopt.matrix(y, (1, n_samples))
-        b = cvxopt.matrix(0.0)
+            sv = np.where(self.out > 0)[0]
 
-        solution = cvxopt.solvers.qp(P, q, G, h, A, b)
+            step, info = linalg.minres(hess_vec, -grad)
 
-        # Lagrange multipliers
-        return np.ravel(solution['x'])
+            t, self.out = self._line_search(self.w, step, self.out)
 
+            self.w += t * step
 
-class SVMPredictor(object):
-    def __init__(self, kernel, bias, weights, support_vectors, support_vector_labels):
-        self._kernel = kernel
-        self._bias = bias
-        self._weights = weights
-        self._support_vectors = support_vectors
-        self._support_vector_labels = support_vector_labels
-        assert len(support_vectors) == len(support_vector_labels)
-        assert len(weights) == len(support_vector_labels)
-        print("Bias: %s", self._bias)
-        print("Weights: %s", self._weights)
-        print("Support vectors: %s", self._support_vectors)
-        print("Support vector labels: %s", self._support_vector_labels)
+            if -step.dot(grad) < self._prec * obj:
+                break
 
-    def predict(self, x):
-        """
-        Computes the SVM prediction on the given features x.
-        """
-        result = self._bias
-        for z_i, x_i, y_i in zip(self._weights,
-                                 self._support_vectors,
-                                 self._support_vector_labels):
-            result += z_i * y_i * self._kernel(x_i, x)
-        return np.sign(result).item()
+    def _matvec_mull(self, v, sv):
+
+        X = self._X
+        l = self.l2reg
+
+        y = l * v
+        y[-1] = 0
+
+        z = X.dot(v[0:-1]) + v[-1]
+        zz = np.zeros(z.shape[0])
+
+        zz[sv] = z[sv]
+        y = y + np.append(zz.dot(X), zz.sum())
+
+        return y
+
+    def _obj_func(self, w, X, Y, out):
+        
+        l2reg = self.l2reg
+
+        bias = w[-1]
+        w[-1] = 0
+
+        max_out = np.fmax(0, out)
+        obj = np.sum(max_out ** 2) / 2 + l2reg * w.dot(w) / 2
+
+        grad = l2reg * w - np.append([np.dot(max_out * Y, X)], [np.sum(max_out * Y)])
+
+        w[-1] = bias
+
+        return (obj, grad)
+
+    def _line_search(self, w, d, out):
+        Xd = self._X.dot(d[0:-1]) + d[-1]
+        wd = self.l2reg * w[0:-1].dot(d[0:-1])
+        dd = self.l2reg * d[0:-1].dot(d[0:-1])
+
+        Y = self._Y
+
+        t = 0
+        iter = 0
+        out2 = out
+
+        while iter < 1000:
+            out2 = out - t * (Y * Xd)
+            sv = np.where(out2 > 0)[0]
+
+            g = wd + t * dd - (out2[sv] * Y[sv]).dot(Xd[sv])
+            h = dd + Xd[sv].dot(Xd[sv])
+            t = t - g / h
+
+            if g ** 2 / h < 1e-10:
+                break
+            iter = iter + 1
+
+        return t, out2
+
+    def predict(self, X):
+
+        w = self.w[0:-1]
+        b = self.w[-1]
+
+        scores = X.dot(w) + b
+
+        prediction = np.sign(scores)
+
+        return prediction, scores
