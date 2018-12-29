@@ -59,7 +59,7 @@ def main():
             if choose == "1":
                 print("Write path to image: ")
                 pred = read_one_file(input())
-                pred, score = trainer.predict(pred)
+                pred = trainer.predict(pred)
                 #print(pred, score)
                 if pred == -1 :
                     print("Your class is Eyes")
